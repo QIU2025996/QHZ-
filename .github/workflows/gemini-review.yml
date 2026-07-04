@@ -21,10 +21,12 @@ jobs:
         id: diff
         run: |
           if [ -n "${{ github.base_ref }}" ]; then
-            git diff origin/${{ github.base_ref }}...HEAD -- . ':(exclude)package-lock.json' ':(exclude)pnpm-lock.yaml' ':(exclude)yarn.lock' > /tmp/pr.diff
+            BASE="origin/${{ github.base_ref }}"
           else
-            git diff origin/main...HEAD -- . ':(exclude)package-lock.json' ':(exclude)pnpm-lock.yaml' ':(exclude)yarn.lock' > /tmp/pr.diff
+            BASE="origin/main"
           fi
+          # Only diff the latest commit to avoid huge prompts
+          git diff $BASE...HEAD -- . ':(exclude)package-lock.json' ':(exclude)pnpm-lock.yaml' ':(exclude)yarn.lock' > /tmp/pr.diff
           echo "diff_size=$(wc -c < /tmp/pr.diff)" >> $GITHUB_OUTPUT
 
       - name: Skip if no code changes
@@ -54,7 +56,7 @@ jobs:
           ESCAPED_PROMPT=$(echo "$PROMPT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
 
           curl -s -X POST \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-lite:generateContent?key=$GEMINI_API_KEY" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=$GEMINI_API_KEY" \
             -H "Content-Type: application/json" \
             -d "{\"contents\":[{\"parts\":[{\"text\":${ESCAPED_PROMPT}}]}]}" \
             > /tmp/review-result.json 2>&1 || true
