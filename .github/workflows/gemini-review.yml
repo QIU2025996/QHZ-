@@ -21,7 +21,11 @@ jobs:
       - name: Get PR diff
         id: diff
         run: |
-          git diff origin/${{ github.base_ref }}...HEAD -- . ':(exclude)package-lock.json' ':(exclude)pnpm-lock.yaml' ':(exclude)yarn.lock' > /tmp/pr.diff
+          if [ -n "${{ github.base_ref }}" ]; then
+            git diff origin/${{ github.base_ref }}...HEAD -- . ':(exclude)package-lock.json' ':(exclude)pnpm-lock.yaml' ':(exclude)yarn.lock' > /tmp/pr.diff
+          else
+            git diff origin/main...HEAD -- . ':(exclude)package-lock.json' ':(exclude)pnpm-lock.yaml' ':(exclude)yarn.lock' > /tmp/pr.diff
+          fi
           echo "diff_size=$(wc -c < /tmp/pr.diff)" >> $GITHUB_OUTPUT
 
       - name: Skip if no code changes
