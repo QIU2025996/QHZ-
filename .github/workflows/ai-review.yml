@@ -36,6 +36,7 @@ jobs:
         id: comments
         env:
           GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
         run: |
           python3 -c "
           import json, urllib.request, os
@@ -61,8 +62,6 @@ jobs:
                   f.write('')
           print(f'Found {len(ai_comments)} previous AI review comments')
           " > /dev/null 2>&1 || echo "No previous comments"
-        env:
-          PR_NUMBER: ${{ github.event.pull_request.number }}
 
       - name: Gemini Review (Round 1)
         id: gemini
