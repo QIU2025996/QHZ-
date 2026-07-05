@@ -20,6 +20,7 @@ jobs:
       - name: Run AI Review
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
           STEPFUN_API_KEY: ${{ secrets.STEPFUN_API_KEY }}
           GITHUB_TOKEN: ${{ github.token }}
           GITHUB_REPOSITORY: ${{ github.repository }}
