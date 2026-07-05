@@ -30,6 +30,7 @@ jobs:
 
       - name: Gemini Review
         id: gemini
+        continue-on-error: true
         env:
           KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
@@ -39,6 +40,7 @@ jobs:
             > /tmp/g.json 2>&1 || echo '{"error":"gemini_failed"}' > /tmp/g.json
 
       - name: Post Gemini
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
