@@ -1,0 +1,41 @@
+name: Lottery AI Analysis
+
+on:
+  pull_request:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  lottery-analysis:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Lottery Analysis
+        env:
+          MIMO_API_KEY: ${{ secrets.MIMO_API_KEY }}
+          AGNES_API_KEY: ${{ secrets.AGNES_API_KEY }}
+          STEPFUN_API_KEY: ${{ secrets.STEPFUN_API_KEY }}
+          GITHUB_TOKEN: ${{ github.token }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          if [ -f happy8_data.csv ]; then
+            cp happy8_data.csv /tmp/happy8_data.csv
+          else
+            echo "期号,日期,号码1,号码2,号码3,号码4,号码5,号码6,号码7,号码8,号码9,号码10,号码11,号码12,号码13,号码14,号码15,号码16,号码17,号码18,号码19,号码20" > /tmp/happy8_data.csv
+            echo "2026110,2026-04-30,10,13,14,26,27,29,30,39,43,46,47,51,53,54,55,57,58,68,71,75" >> /tmp/happy8_data.csv
+          fi
+          if [ -f lottery_question.txt ]; then
+            cp lottery_question.txt /tmp/lottery_question.txt
+          else
+            echo "请分析最新一期快乐8的开奖号码规律" > /tmp/lottery_question.txt
+          fi
+          cp .github/scripts/lottery_analysis.py /tmp/analysis.py
+          python3 /tmp/analysis.py
