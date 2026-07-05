@@ -37,32 +37,8 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
-          DIFF_CONTENT=$(cat /tmp/pr.diff)
-          ESCAPED_PROMPT=$(echo "Review this PR diff: ${DIFF_CONTENT}" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
-
-          curl -s -X POST \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=AIzaSyCHbxYXLJeR4GvXxresXnfCZhEQ60oSFPs" \
-            -H "Content-Type: application/json" \
-            -d "{\"contents\":[{\"parts\":[{\"text\":${ESCAPED_PROMPT}}]}]}" \
-            > /tmp/gemini-result.json 2>&1 || true
-
-      - name: Format Gemini
-        run: |
-          python3 -c "
-import json
-try:
-    with open('/tmp/gemini-result.json') as f:
-        data = json.load(f)
-    text = ''
-    if data.get('candidates'):
-        for p in data['candidates'][0].get('content',{}).get('parts',[]):
-            text += p.get('text','')
-    with open('/tmp/gemini-review.md', 'w') as f:
-        f.write(text or 'Error: No response from Gemini')
-except Exception as e:
-    with open('/tmp/gemini-review.md', 'w') as f:
-        f.write(f'Error: {e}')
-"
+          cp .github/scripts/gemini_review.py /tmp/gemini_review.py
+          python3 /tmp/gemini_review.py
 
       - name: Post Gemini comment
         uses: actions/github-script@v7
@@ -83,41 +59,7 @@ except Exception as e:
         env:
           STEPFUN_API_KEY: ${{ secrets.STEPFUN_API_KEY }}
         run: |
-          DIFF_CONTENT=$(cat /tmp/pr.diff)
-          GEMINI_REVIEW=$(cat /tmp/gemini-review.md)
-
-          echo "$DIFF_CONTENT" > /tmp/diff_for_stepfun.txt
-          echo "$GEMINI_REVIEW" > /tmp/gemini_for_stepfun.txt
-
-          python3 -c "
-import json, urllib.request, os
-
-with open('/tmp/diff_for_stepfun.txt') as f:
-    diff = f.read()
-with open('/tmp/gemini_for_stepfun.txt') as f:
-    gemini = f.read()
-
-prompt = 'You are an expert code reviewer. Gemini already reviewed this PR below. Provide your own analysis.\n\nGemini review:\n' + gemini + '\n\nDiff:\n' + diff
-
-data = json.dumps({
-    'model': 'step-3.7-flash',
-    'messages': [{'role': 'user', 'content': prompt}]
-}).encode()
-
-req = urllib.request.Request(
-    'https://api.stepfun.com/step_plan/v1/chat/completions',
-    data=data,
-    headers={
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + os.environ['STEPFUN_API_KEY']
-    }
-)
-with urllib.request.urlopen(req) as resp:
-    result = json.loads(resp.read())
-    text = result['choices'][0]['message']['content']
-    with open('/tmp/stepfun-review.md', 'w') as f:
-        f.write(text)
-" 2>&1 || echo "Error: StepFun API call failed" > /tmp/stepfun-review.md
+          python3 /tmp/stepfun_review.py
 
       - name: Post StepFun comment
         uses: actions/github-script@v7
