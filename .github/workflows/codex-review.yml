@@ -35,7 +35,7 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          codex exec --sandbox read-only -m gpt-5.4 -C "$(pwd)" -q \
+          codex exec --sandbox read-only -m gpt-5.4 -C "$(pwd)" \
             "Review this pull request diff. \
              Provide a structured review with: \
              1. SUMMARY (1-2 sentences) \
