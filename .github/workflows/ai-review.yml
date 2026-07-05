@@ -42,6 +42,7 @@ jobs:
           python3 /tmp/gemini_review.py
 
       - name: Post Gemini comment
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
@@ -64,6 +65,7 @@ jobs:
           python3 /tmp/stepfun_review.py
 
       - name: Post StepFun comment
+        continue-on-error: true
         uses: actions/github-script@v7
         with:
           script: |
