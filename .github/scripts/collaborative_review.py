@@ -97,11 +97,11 @@ for round_num in range(1, MAX_ROUNDS + 1):
     print(f"Running Mimo review (round {round_num})...")
     if round_num == 1:
         mimo_prompt = (
-            "你是一位专业的中文代码审查专家。请用中文审查以下 PR diff。\n\n"
-            "请按以下格式输出：\n"
+            "你是一位专业的中文代码审查专家。你必须用中文回答，禁止使用英文。\n\n"
+            "请严格按以下格式用中文输出：\n\n"
             "## 摘要\n"
-            "简要描述 PR 的内容。\n\n"
-            "## 问题（按严重程度）\n"
+            "简要描述这个PR改了什么。\n\n"
+            "## 问题\n"
             "- CRITICAL：严重问题\n"
             "- HIGH：重要问题\n"
             "- MEDIUM：一般问题\n"
@@ -109,18 +109,19 @@ for round_num in range(1, MAX_ROUNDS + 1):
             "## 改进建议\n"
             "具体的代码改进建议。\n\n"
             "## 结论\n"
-            "APPROVE（批准）或 REQUEST_CHANGES（需要修改）\n\n"
+            "写 APPROVE 或 REQUEST_CHANGES\n\n"
             f"过往审核记忆：\n{memory}\n\n"
             f"PR Diff:\n{diff}"
         )
     else:
         mimo_prompt = (
-            f"你是一位专业的中文代码审查专家。上一轮审核发现了问题，请重新审查。\n\n"
+            f"你是一位专业的中文代码审查专家。你必须用中文回答，禁止使用英文。\n\n"
+            f"上一轮审核发现了问题，请重新审查代码是否已修复。\n\n"
             f"过往审核记忆：\n{memory}\n\n"
             f"上一轮反馈：\n{prev_context}\n\n"
-            f"当前 Diff:\n{diff}\n\n"
-            f"请按以下格式用中文输出：\n"
-            f"## 摘要 / ## 问题（按严重程度）/ ## 改进建议 / ## 结论（APPROVE 或 REQUEST_CHANGES）"
+            f"当前 Diff：\n{diff}\n\n"
+            f"请严格按以下格式用中文输出：\n"
+            f"## 摘要 / ## 问题 / ## 改进建议 / ## 结论（APPROVE 或 REQUEST_CHANGES）"
         )
 
     mimo_data = json.dumps({
@@ -157,15 +158,17 @@ for round_num in range(1, MAX_ROUNDS + 1):
     print(f"Running Agnes AI review (round {round_num})...")
     if round_num == 1:
         agnes_prompt = (
-            f"你是一位专业的中文代码审查专家。Mimo AI 已经审核了以下 PR，请给出你独立的分析意见。\n\n"
+            f"你是一位专业的中文代码审查专家。你必须用中文回答，禁止使用英文。\n\n"
+            f"Mimo AI 已经审核了以下 PR，请给出你独立的分析意见。\n\n"
             f"过往审核记忆：\n{memory}\n\n"
             f"Mimo 的审核结果：\n{mimo_text}\n\n"
             f"PR Diff:\n{diff}\n\n"
-            f"请用中文输出：## 摘要 / ## 问题（按严重程度） / ## 改进建议 / ## 结论"
+            f"请用中文输出：## 摘要 / ## 问题 / ## 改进建议 / ## 结论"
         )
     else:
         agnes_prompt = (
-            f"你是一位专业的中文代码审查专家。上一轮审核发现了问题，请重新审查。\n\n"
+            f"你是一位专业的中文代码审查专家。你必须用中文回答，禁止使用英文。\n\n"
+            f"上一轮审核发现了问题，请重新审查。\n\n"
             f"过往审核记忆：\n{memory}\n\n"
             f"{prev_context}\n"
             f"Mimo 最新结果：\n{mimo_text}\n\n"
@@ -205,16 +208,18 @@ for round_num in range(1, MAX_ROUNDS + 1):
     print(f"Running Claude (StepFun) review (round {round_num})...")
     if round_num == 1:
         stepfun_prompt = (
-            f"你是一位专业的中文代码审查专家。Mimo AI 和 Agnes AI 已经审核了以下 PR，请综合所有审核结果给出你的最终分析。\n\n"
+            f"你是一位专业的中文代码审查专家。你必须用中文回答，禁止使用英文。\n\n"
+            f"Mimo AI 和 Agnes AI 已经审核了以下 PR，请综合所有审核结果给出你的最终分析。\n\n"
             f"过往审核记忆：\n{memory}\n\n"
             f"Mimo 审核结果：\n{mimo_text}\n\n"
             f"Agnes AI 审核结果：\n{agnes_text}\n\n"
             f"PR Diff:\n{diff}\n\n"
-            f"请用中文输出：## 摘要 / ## 问题（按严重程度） / ## 改进建议 / ## 结论"
+            f"请用中文输出：## 摘要 / ## 问题 / ## 改进建议 / ## 结论"
         )
     else:
         stepfun_prompt = (
-            f"你是一位专业的中文代码审查专家。上一轮审核发现了问题，请重新审查。\n\n"
+            f"你是一位专业的中文代码审查专家。你必须用中文回答，禁止使用英文。\n\n"
+            f"上一轮审核发现了问题，请重新审查。\n\n"
             f"过往审核记忆：\n{memory}\n\n"
             f"{prev_context}\n"
             f"Mimo 最新结果：\n{mimo_text}\n\n"
