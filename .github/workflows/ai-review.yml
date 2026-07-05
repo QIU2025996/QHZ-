@@ -88,7 +88,7 @@ ${DIFF_CONTENT}
           ESCAPED_PROMPT=$(echo "$PROMPT" | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
 
           RESPONSE=$(curl -s -X POST \
-            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=$GEMINI_API_KEY" \
+            "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=AIzaSyCHbxYXLJeR4GvXxresXnfCZhEQ60oSFPs" \
             -H "Content-Type: application/json" \
             -d "{\"contents\":[{\"parts\":[{\"text\":${ESCAPED_PROMPT}}]}]}")
 
