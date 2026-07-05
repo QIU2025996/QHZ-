@@ -34,6 +34,7 @@ jobs:
 
       - name: Gemini Review
         id: gemini
+        continue-on-error: true
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
@@ -59,6 +60,7 @@ jobs:
         env:
           STEPFUN_API_KEY: ${{ secrets.STEPFUN_API_KEY }}
         run: |
+          cp .github/scripts/stepfun_review.py /tmp/stepfun_review.py
           python3 /tmp/stepfun_review.py
 
       - name: Post StepFun comment
